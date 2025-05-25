@@ -222,7 +222,7 @@ if ($action === 'edit' && $id) {
     $editApplication = $stmt->fetch(PDO::FETCH_ASSOC);
     
     // Fill form data if validation failed
-    if (!empty($errors) {
+    if (!empty($errors)) {
         $editApplication = array_merge($editApplication, $formData);
         $editApplication['languages'] = implode(',', $formData['language']);
     }
