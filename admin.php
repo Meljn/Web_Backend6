@@ -144,7 +144,6 @@ if ($action === 'edit' && $id) {
     $editApplication = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Get all languages for select
 $stmt = $pdo->query("SELECT Name FROM Programming_Languages ORDER BY Name");
 $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
@@ -156,60 +155,82 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <title>Admin Panel</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #171717;
+            color: #e5e5e5;
         }
-        .container {
+
+        .admin-container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            background: #262626;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            border: 1px solid #333;
         }
+
         h1, h2 {
-            color: #333;
+            color: #f0f0f0;
+            font-weight: 600;
         }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #404040;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 30px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: #333;
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #404040;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #2e2e2e;
+            color: #d1d1d1;
+            font-weight: 500;
         }
+
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #2a2a2a;
         }
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
+
+        tr:hover {
+            background-color: #3a3a3a;
         }
-        .success {
-            background-color: #dff0d8;
-            color: #3c763d;
-        }
-        .error {
-            background-color: #f2dede;
-            color: #a94442;
-        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #d1d1d1;
+            font-size: 15px;
         }
+
         input[type="text"],
         input[type="tel"],
         input[type="email"],
@@ -217,68 +238,117 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
         textarea,
         select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            background-color: #333;
+            color: #f0f0f0;
+            font-size: 15px;
         }
-        textarea {
-            height: 100px;
-        }
+
         select[multiple] {
-            height: 150px;
+            min-height: 150px;
+            padding: 8px !important;
         }
-        button {
-            padding: 8px 15px;
-            background-color: #5cb85c;
+
+        option {
+            padding: 8px;
+            background: #333;
+        }
+
+        option:checked {
+            background-color: #1a73e8;
             color: white;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        button, .btn {
+            background-color: #1a73e8;
+            color: white;
+            padding: 12px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
-        button:hover {
-            background-color: #4cae4c;
+
+        button:hover, .btn:hover {
+            background-color: #1765cc;
         }
-        .actions {
-            white-space: nowrap;
+
+        .btn-delete {
+            background-color: #d65454;
         }
-        .actions a {
-            display: inline-block;
-            margin-right: 5px;
-            padding: 3px 8px;
-            text-decoration: none;
-            border-radius: 3px;
+
+        .btn-delete:hover {
+            background-color: #c04545;
         }
-        .edit {
-            background-color: #337ab7;
-            color: white;
+
+        .message {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
         }
-        .delete {
-            background-color: #d9534f;
-            color: white;
+
+        .success {
+            background-color: #1f2e1f;
+            border-left: 4px solid #81c784;
+            color: #a5d6a7;
         }
-        .stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 30px;
+
+        .error {
+            background-color: #2e1f1f;
+            border-left: 4px solid #d65454;
+            color: #ff8a80;
         }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
         .stat-card {
-            flex: 1;
-            min-width: 200px;
-            background: white;
+            background: #2e2e2e;
             padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border-left: 4px solid #1a73e8;
         }
+
         .stat-card h3 {
             margin-top: 0;
-            color: #555;
+            margin-bottom: 10px;
+            color: #d1d1d1;
+            font-size: 16px;
         }
+
         .stat-value {
             font-size: 24px;
-            font-weight: bold;
-            color: #337ab7;
+            font-weight: 600;
+            color: #f0f0f0;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
