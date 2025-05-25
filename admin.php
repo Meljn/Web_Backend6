@@ -163,8 +163,8 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
             color: #e5e5e5;
         }
 
-        .admin-container {
-            max-width: 1200px;
+        .container {
+            width: 1200px;
             margin: 0 auto;
             padding: 25px;
             background: #262626;
