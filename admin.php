@@ -248,6 +248,12 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
             color: #e5e5e5;
         }
 
+         .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
         .admin-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -282,14 +288,19 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
             background: #333;
             border-radius: 8px;
             overflow: hidden;
+            table-layout: fixed;
         }
 
-        th, td {
+         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #404040;
+            word-wrap: break-word;
         }
 
+        th:nth-child(1), td:nth-child(1) { width: 50px; }
+        th:nth-child(9), td:nth-child(9) { width: 180px; }
+        
         th {
             background-color: #2e2e2e;
             color: #d1d1d1;
@@ -362,6 +373,14 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
             font-weight: 500;
             transition: background-color 0.2s;
             margin-right: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 14px;
         }
 
         button:hover, .btn:hover {
