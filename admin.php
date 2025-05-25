@@ -65,7 +65,6 @@ if ($action === 'delete' && $id) {
     try {
         $pdo->beginTransaction();
         
-        // Update Application table
         $stmt = $pdo->prepare("UPDATE Application SET 
             FIO = :fio, 
             Phone_number = :phone, 
@@ -87,7 +86,6 @@ if ($action === 'delete' && $id) {
             ':id' => $id
         ]);
         
-        // Update languages - first delete existing, then insert new
         $stmt = $pdo->prepare("DELETE FROM Application_Languages WHERE Application_ID = ?");
         $stmt->execute([$id]);
         
@@ -106,7 +104,6 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Get all applications with their languages
 $applications = [];
 $stmt = $pdo->query("
     SELECT a.*, GROUP_CONCAT(p.Name) as languages 
@@ -118,7 +115,6 @@ $stmt = $pdo->query("
 ");
 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get language statistics
 $languageStats = [];
 $stmt = $pdo->query("
     SELECT p.Name, COUNT(al.Application_ID) as user_count 
@@ -129,7 +125,6 @@ $stmt = $pdo->query("
 ");
 $languageStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get application for editing
 $editApplication = null;
 if ($action === 'edit' && $id) {
     $stmt = $pdo->prepare("
@@ -155,82 +150,60 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <title>Admin Panel</title>
     <style>
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            background-color: #171717;
-            color: #e5e5e5;
+            background-color: #f5f5f5;
         }
-
         .container {
-            width: 1200px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 25px;
-            background: #262626;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-            border: 1px solid #333;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
         h1, h2 {
-            color: #f0f0f0;
-            font-weight: 600;
+            color: #333;
         }
-
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #404040;
-            padding-bottom: 10px;
-        }
-
-        h2 {
-            font-size: 20px;
-            margin-top: 30px;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
-            background: #333;
-            border-radius: 8px;
-            overflow: hidden;
+            margin-bottom: 20px;
         }
-
         th, td {
-            padding: 12px 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
             text-align: left;
-            border-bottom: 1px solid #404040;
         }
-
         th {
-            background-color: #2e2e2e;
-            color: #d1d1d1;
-            font-weight: 500;
+            background-color: #f2f2f2;
         }
-
         tr:nth-child(even) {
-            background-color: #2a2a2a;
+            background-color: #f9f9f9;
         }
-
-        tr:hover {
-            background-color: #3a3a3a;
+        .message {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
         }
-
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 15px;
         }
-
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #d1d1d1;
-            font-size: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
-
         input[type="text"],
         input[type="tel"],
         input[type="email"],
@@ -238,117 +211,68 @@ $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
         textarea,
         select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #404040;
-            border-radius: 8px;
-            background-color: #333;
-            color: #f0f0f0;
-            font-size: 15px;
-        }
-
-        select[multiple] {
-            min-height: 150px;
-            padding: 8px !important;
-        }
-
-        option {
             padding: 8px;
-            background: #333;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
-
-        option:checked {
-            background-color: #1a73e8;
-            color: white;
-        }
-
         textarea {
-            min-height: 120px;
-            resize: vertical;
+            height: 100px;
         }
-
-        button, .btn {
-            background-color: #1a73e8;
+        select[multiple] {
+            height: 150px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #5cb85c;
             color: white;
-            padding: 12px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: background-color 0.2s;
         }
-
-        button:hover, .btn:hover {
-            background-color: #1765cc;
+        button:hover {
+            background-color: #4cae4c;
         }
-
-        .btn-delete {
-            background-color: #d65454;
+        .actions {
+            white-space: nowrap;
         }
-
-        .btn-delete:hover {
-            background-color: #c04545;
+        .actions a {
+            display: inline-block;
+            margin-right: 5px;
+            padding: 3px 8px;
+            text-decoration: none;
+            border-radius: 3px;
         }
-
-        .message {
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-weight: 500;
+        .edit {
+            background-color: #337ab7;
+            color: white;
         }
-
-        .success {
-            background-color: #1f2e1f;
-            border-left: 4px solid #81c784;
-            color: #a5d6a7;
+        .delete {
+            background-color: #d9534f;
+            color: white;
         }
-
-        .error {
-            background-color: #2e1f1f;
-            border-left: 4px solid #d65454;
-            color: #ff8a80;
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
         .stat-card {
-            background: #2e2e2e;
+            flex: 1;
+            min-width: 200px;
+            background: white;
             padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #1a73e8;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
-
         .stat-card h3 {
             margin-top: 0;
-            margin-bottom: 10px;
-            color: #d1d1d1;
-            font-size: 16px;
+            color: #555;
         }
-
         .stat-value {
             font-size: 24px;
-            font-weight: 600;
-            color: #f0f0f0;
-        }
-
-        @media (max-width: 768px) {
-            .admin-container {
-                padding: 15px;
-            }
-            
-            th, td {
-                padding: 8px 10px;
-                font-size: 14px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+            font-weight: bold;
+            color: #337ab7;
         }
     </style>
 </head>
