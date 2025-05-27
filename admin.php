@@ -1,9 +1,5 @@
 <?php
-/**
- * Админ-панель с HTTP-аутентификацией
- */
 
-// HTTP Authentication
 if (empty($_SERVER['PHP_AUTH_USER']) ||
     empty($_SERVER['PHP_AUTH_PW']) ||
     $_SERVER['PHP_AUTH_USER'] != 'admin' ||
@@ -50,7 +46,6 @@ if (empty($_SERVER['PHP_AUTH_USER']) ||
     exit();
 }
 
-// Database connection
 $db_host = 'localhost';
 $db_user = 'u68532';
 $db_pass = '9110579';
@@ -63,7 +58,6 @@ try {
     die("Ошибка подключения к базе данных: " . $e->getMessage());
 }
 
-// Handle actions
 $action = $_GET['action'] ?? '';
 $id = $_GET['id'] ?? 0;
 $errors = [];
@@ -97,7 +91,6 @@ if ($action === 'delete' && $id) {
         'language' => $_POST['language'] ?? []
     ];
 
-    // Validation (same as in form.php)
     if (empty($formData['FIO'])) {
         $errors['FIO'] = 'Поле ФИО обязательно для заполнения';
     } elseif (!preg_match('/^[A-Za-zА-Яа-яЁё\s]+$/u', $formData['FIO'])) {
@@ -184,7 +177,6 @@ if ($action === 'delete' && $id) {
     }
 }
 
-// Get all applications with their languages
 $applications = [];
 $stmt = $pdo->query("
     SELECT a.*, GROUP_CONCAT(p.Name) as languages 
@@ -196,7 +188,6 @@ $stmt = $pdo->query("
 ");
 $applications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get language statistics
 $languageStats = [];
 $stmt = $pdo->query("
     SELECT p.Name, COUNT(al.Application_ID) as user_count 
@@ -207,7 +198,6 @@ $stmt = $pdo->query("
 ");
 $languageStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get application for editing
 $editApplication = null;
 if ($action === 'edit' && $id) {
     $stmt = $pdo->prepare("
@@ -221,14 +211,12 @@ if ($action === 'edit' && $id) {
     $stmt->execute([$id]);
     $editApplication = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Fill form data if validation failed
     if (!empty($errors)) {
         $editApplication = array_merge($editApplication, $formData);
         $editApplication['languages'] = implode(',', $formData['language']);
     }
 }
 
-// Get all languages for select
 $stmt = $pdo->query("SELECT Name FROM Programming_Languages ORDER BY Name");
 $allLanguages = $stmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
